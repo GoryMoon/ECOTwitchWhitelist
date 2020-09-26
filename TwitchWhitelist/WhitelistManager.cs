@@ -112,14 +112,14 @@ namespace TwitchWhitelist
         
         private static void UpdateWhitelist(User user = null)
         {
-            var preMessage = Localizer.Do(FormattableStringFactory.Create($"{LogTag} Refreshing whitelist ids..."));
+            var preMessage = Localizer.Do(FormattableStringFactory.Create("{0} Refreshing whitelist ids...", LogTag));
             user?.Player.Msg(preMessage);
             Log.WriteLine(preMessage);
             
             var whiteList = UserManager.Config.WhiteList;
             if (Config.WhitelistUrls.Count <= 0)
             {
-                var noChangeMessage = Localizer.Do(FormattableStringFactory.Create($"{LogTag} No links in the config, skipping."));
+                var noChangeMessage = Localizer.Do(FormattableStringFactory.Create("{0} No links in the config, skipping.", LogTag));
                 user?.Player.Msg(noChangeMessage);
                 Log.WriteLine(noChangeMessage);
                 return;
@@ -141,6 +141,10 @@ namespace TwitchWhitelist
                     wait.Set();
                 });
                 wait.WaitOne();
+                if (errored)
+                {
+                    continue;
+                }
                 allIds.AddAll(ids);
             }
 
@@ -154,14 +158,14 @@ namespace TwitchWhitelist
             whiteList.AddUniqueRange(Config.ManualWhiteList.CleanStrings());
             if (old.SequenceEqual(whiteList))
             {
-                var noChange = Localizer.Do(FormattableStringFactory.Create($"{LogTag} Refreshed whitelist ids! Not change in list."));
+                var noChange = Localizer.Do(FormattableStringFactory.Create("{0} Refreshed whitelist ids! Not change in list.", LogTag));
                 user?.Player.Msg(noChange);
                 Log.WriteLine(noChange);
                 return;
             }
             UserManager.Obj.SaveConfig();
             
-            var postMessage = Localizer.Do(FormattableStringFactory.Create($"{LogTag} Refreshed whitelist ids! Old amount: {0} whitelisted, New amount: {1} whitelisted", oldListCount, whiteList.Count));
+            var postMessage = Localizer.Do(FormattableStringFactory.Create("{0} Refreshed whitelist ids! Old amount: {1} whitelisted, New amount: {2} whitelisted", LogTag, oldListCount, whiteList.Count));
             user?.Player.Msg(postMessage);
             Log.WriteLine(postMessage);
         }
@@ -189,7 +193,7 @@ namespace TwitchWhitelist
                 }
                 catch (Exception ex)
                 {
-                    Log.WriteErrorLine(Localizer.Do(FormattableStringFactory.Create($"{LogTag} Error when fetching whitelist: {0} {1}", url, (object) ex.Message)));
+                    Log.WriteErrorLine(Localizer.Do(FormattableStringFactory.Create("{0} Error when fetching whitelist: {1} {2}", LogTag, url, (object) ex.Message)));
                     exception = ex;
                 }
                 callback(result, exception);
